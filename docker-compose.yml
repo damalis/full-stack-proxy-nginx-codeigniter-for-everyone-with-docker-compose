@@ -239,7 +239,7 @@ networks:
 
 volumes:
     html:
-        name: codeigniter
+        name: codeigniter-html
         driver: local
         driver_opts:
             type: none
