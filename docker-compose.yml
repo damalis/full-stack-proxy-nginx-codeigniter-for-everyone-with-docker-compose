@@ -26,16 +26,16 @@ services:
             - redis
         healthcheck:
             test: ["CMD-SHELL", "curl -fk https://${DOMAIN_NAME} || exit 1"]
-            interval: 6s
+            interval: 10s
             timeout: 5s
-            retries: 4
+            retries: 6
             start_period: 60s
         environment:
             TZ: '${LOCAL_TIMEZONE}'
         labels:            
             - 'docker-volume-backup.stop-during-backup=true'
         command: >
-            bash -c "apt-get -y update && apt-get install -y zip unzip libicu-dev && docker-php-ext-install mysqli intl && pecl install -o -f redis && rm -rf /tmp/pear && docker-php-ext-enable redis mysqli intl; curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && if [ -f \"${WEBSERVER_DOC_ROOT}/appstarter/.env\" ]; then composer update --working-dir=./appstarter --no-interaction --ignore-platform-req=ext-intl; else composer create-project codeigniter4/appstarter --no-dev --prefer-dist --no-interaction --ignore-platform-req=ext-intl; fi; 
+            bash -c "apt-get -y update && apt-get install -y zip unzip libicu-dev && docker-php-ext-install mysqli intl && pecl install -o -f redis && rm -rf /tmp/pear && docker-php-ext-enable redis mysqli intl; curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && if [ -f \"${WEBSERVER_DOC_ROOT}/appstarter/.env\" ]; then composer update --prefer-dist --working-dir=./appstarter --no-interaction --ignore-platform-req=ext-intl; else composer create-project --prefer-dist codeigniter4/appstarter --no-dev --no-interaction --ignore-platform-req=ext-intl; fi; 
             sed \"s/# app.baseURL = ''/app.baseURL = 'https:\/\/${DOMAIN_NAME}\/'/;s/# app_baseURL = ''/app_baseURL = 'https:\/\/${DOMAIN_NAME}\/'/;s/# database.default.hostname = localhost/database.default.hostname = database/;s/# database.default.database = ci4/database.default.database = ${DB_NAME}/;s/# database.default.username = root/database.default.username = ${DB_USER}/;s/# database.default.password = root/database.default.password = ${DB_PASSWORD}/;s/# database.default.DBDriver = MySQLi/database.default.DBDriver = MySQLi/;s/# database.default.DBPrefix =/database.default.DBPrefix = ${DB_TABLE_PREFIX}/;s/# database.default.port = 3306/database.default.port = 3306/\" ${WEBSERVER_DOC_ROOT}/appstarter/env > ${WEBSERVER_DOC_ROOT}/appstarter/.env; 
             chmod 777 -R ${WEBSERVER_DOC_ROOT}/appstarter/writable/; grep -qe 'date.timezone = ${LOCAL_TIMEZONE}' ${PHP_INI_DIR_PREFIX}/php/conf.d/security.ini || echo 'date.timezone = ${LOCAL_TIMEZONE}' >> ${PHP_INI_DIR_PREFIX}/php/conf.d/security.ini; php-fpm"
 
@@ -51,7 +51,7 @@ services:
             - type: bind
               source: ./apache2
               target: '${HTTPD_PREFIX}/conf'            
-        hostname: webserver        
+        hostname: webserver
         restart: unless-stopped
         ports:
             - '8080:8080'
@@ -148,7 +148,7 @@ services:
         #    - database
         environment:
             #PMA_HOST: database
-            PMA_PMADB: 'phpmyadmin'
+            PMA_PMADB: phpmyadmin
             PMA_CONTROLUSER: '${PMA_CONTROLUSER}'
             PMA_CONTROLPASS: '${PMA_CONTROLPASS}'
             MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
@@ -160,7 +160,7 @@ services:
         command: >
             bash -c "echo ${PMA_HTPASSWD_USERNAME}:phpmyadmin:$$( printf \"%s:%s:%s\" \"${PMA_HTPASSWD_USERNAME}\" \"phpmyadmin\" \"${PMA_HTPASSWD_PASSWORD}\" | md5sum | awk '{print $$1}' ) > ${PMA_CONF_FOLDER}/.htpasswd 
             && printf 'AuthType Digest\nAuthName \"phpmyadmin\"\nAuthDigestProvider file\nAuthUserFile ${PMA_CONF_FOLDER}/.htpasswd\nRequire valid-user\n' > ${WEBSERVER_DOC_ROOT}/.htaccess && a2enmod auth_digest; 
-            mkdir -p ${WEBSERVER_DOC_ROOT}/../upload && chown www-data:www-data ${WEBSERVER_DOC_ROOT}/../upload && chmod a+w ${WEBSERVER_DOC_ROOT}/../upload; mkdir -p ${WEBSERVER_DOC_ROOT}/../save && chown www-data:www-data ${WEBSERVER_DOC_ROOT}/../save && chmod a+w ${WEBSERVER_DOC_ROOT}/../save; 
+            mkdir -p ${WEBSERVER_DOC_ROOT}/../upload && chown www-data:www-data ${WEBSERVER_DOC_ROOT}/../upload && chmod a+w ${WEBSERVER_DOC_ROOT}/../upload && mkdir -p ${WEBSERVER_DOC_ROOT}/../save && chown www-data:www-data ${WEBSERVER_DOC_ROOT}/../save && chmod a+w ${WEBSERVER_DOC_ROOT}/../save; 
             grep -qxF 'ServerName 127.0.0.1' ${APACHE_CONFDIR_PREFIX}/apache2.conf || echo -e '\nServerName 127.0.0.1' >> ${APACHE_CONFDIR_PREFIX}/apache2.conf; grep -qe 'date.timezone = ${LOCAL_TIMEZONE}' ${PHP_INI_DIR_PREFIX}/php/conf.d/security.ini || echo 'date.timezone = ${LOCAL_TIMEZONE}' >> ${PHP_INI_DIR_PREFIX}/php/conf.d/security.ini; 
             a2enmod ssl && a2ensite default-ssl && a2dissite 000-default && /docker-entrypoint.sh 'apache2-foreground'"
     
