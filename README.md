@@ -35,9 +35,17 @@ Create rules to open ports to the internet, or to a specific IPv4 address or ran
 
 - [Auto Configuration and Installation](#automatic)
 - [Requirements](#requirements)
-- [Configuration](#configuration)
-- [Installation](#installation)
+- [Manual Configuration and Installation](#manual)
+- [Portainer Installation](#portainer)
 - [Usage](#usage)
+- [Usage](#usage)
+	- [Website](#website)
+	- [Proxy](#proxy)
+	- [Webserver](#webserver)
+	- [Redis](#redis)
+	- [Cache](#cache)
+	- [phpMyAdmin](#phpmyadmin)
+	- [backup](#backup)					  
 
 ## Automatic
 
@@ -68,7 +76,9 @@ Clone this repository or copy the files from this repository into a new folder. 
 
 Make sure to [add your user to the `docker` group](https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
 
-## Configuration
+## Manual
+
+### Configuration
 
 download with
 
@@ -81,8 +91,6 @@ Open a terminal and `cd` to the folder in which `docker-compose.yml` is saved an
 ```
 cd full-stack-proxy-nginx-codeigniter-for-everyone-with-docker-compose
 ```
-
-### Manual
 
 Copy the example environment into `.env`
 
@@ -104,9 +112,7 @@ cp ./phpmyadmin/apache2/sites-available/default-ssl.sample.conf ./phpmyadmin/apa
 
 change example.com to your domain name in ```./phpmyadmin/apache2/sites-available/default-ssl.conf``` file.
 
-## Installation
-
-### Manual
+### Installation
 
 Firstly: will create external volume
 
@@ -128,7 +134,7 @@ The containers are now built and running. You should be able to access the CodeI
 
 For convenience you may add a new entry into your hosts file.
 
-### Installation Portainer
+## Portainer
 
 ```
 docker volume create portainer_data
@@ -200,6 +206,10 @@ You can now use the `up` command:
 docker-compose up -d
 ```
 
+### Docker run reference
+
+[https://docs.docker.com/engine/reference/run/](https://docs.docker.com/engine/reference/run/)
+
 ### Website
 
 You should see the "Welcome to CodeIgniter..." page in your browser. If not, please check if your PHP installation satisfies CodeIgniter's requirements.
@@ -210,17 +220,15 @@ https://example.com
 
 add or remove code in the ./php-fpm/php/conf.d/security.ini file for custom php.ini configurations
 
-Copy and paste the following code in the ./php-fpm/php-fpm.d/z-www.conf file for php-fpm configurations at 1Gb Ram Host
+[https://www.php.net/manual/en/configuration.file.php](https://www.php.net/manual/en/configuration.file.php)
 
-```
-pm.max_children = 19
-pm.start_servers = 4
-pm.min_spare_servers = 2
-pm.max_spare_servers = 4
-pm.max_requests = 1000
-```
+add or remove code in the ```./php-fpm/php-fpm.d/z-www.conf``` file for php-fpm configurations
 
 Or you should make changes custom host configurations then must restart service
+
+FPM uses php.ini syntax for its configuration file - php-fpm.conf, and pool configuration files.
+
+[https://www.php.net/manual/en/install.fpm.configuration.php](https://www.php.net/manual/en/install.fpm.configuration.php)
 
 ```
 docker container restart codeigniter
@@ -229,20 +237,52 @@ docker container restart codeigniter
 add and/or remove codeigniter site folders and files with any ftp client program in ```./codeigniter/appstarter``` folder.
 <br />You can also visit `https://example.com` to access website after starting the containers.
 
+#### Proxy
+
+Proxying is typically used to distribute the load among several servers, seamlessly show content from different websites, or pass requests for processing to application servers over protocols other than HTTP.
+
+[https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+
+#### Webserver
+
+add or remove code in the ```./webserver/extra/httpd-vhosts.conf``` file for custom apache2/httpd configurations
+
+[https://httpd.apache.org/docs/2.4/](https://httpd.apache.org/docs/2.4/)
+
 #### Redis
 
-[Redis Cache](https://codeigniter.com/userguide3/libraries/caching.html#redis-caching), Config options to connect to redis server must be stored in the application/config/redis.php file.
+[Redis Cache](https://codeigniter.com/user_guide/libraries/caching.html?highlight=cache#redis-caching), Config options to connect to redis server stored in the cache configuration file.
 
 Available options are:
 
 ```
-$config['socket_type'] = 'tcp'; //`tcp` or `unix`
-$config['socket'] = '/var/run/redis.sock'; // in case of `unix` socket type
-$config['host'] = 'redis';
-$config['password'] = NULL;
-$config['port'] = 6379;
-$config['timeout'] = 0;
+<?php
+
+namespace Config;
+
+use CodeIgniter\Config\BaseConfig;
+
+class Cache extends BaseConfig
+{
+    // ...
+
+    public $redis = [
+        'host'     => 'redis',
+        'password' => null,
+        'port'     => 6379,
+        'timeout'  => 0,
+        'database' => 0,
+    ];
+
+    // ...
+}
 ```
+
+#### Cache
+
+CodeIgniter features wrappers around some of the most popular forms of fast and dynamic caching. All but file-based caching require specific server requirements, and a Fatal Exception will be thrown if server requirements are not met.
+
+[https://codeigniter.com/user_guide/libraries/caching.html?highlight=cache](https://codeigniter.com/user_guide/libraries/caching.html?highlight=cache)
 
 ### phpMyAdmin
 
