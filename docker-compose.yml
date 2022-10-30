@@ -10,7 +10,7 @@ services:
         networks:
             - backend
         volumes:
-            - 'html:${WEBSERVER_DOC_ROOT}'            
+            - 'html:${WEBSERVER_DOC_ROOT}'
             - type: bind
               source: ./php-fpm/php/conf.d/security.ini
               target: '${PHP_INI_DIR_PREFIX}/php/conf.d/security.ini'
@@ -49,7 +49,7 @@ services:
         volumes:
             - 'html:${WEBSERVER_DOC_ROOT}'
             - type: bind
-              source: ./apache2
+              source: ./webserver
               target: '${HTTPD_PREFIX}/conf'            
         hostname: webserver
         restart: unless-stopped
@@ -106,7 +106,9 @@ services:
         restart: unless-stopped
         ports:
             - '80:80'
-            - '443:443' 
+            - '443:443'
+        links:
+            - webserver
         environment:
             NGINX_HOST: ${DOMAIN_NAME}
             NGINX_PORT: 80
