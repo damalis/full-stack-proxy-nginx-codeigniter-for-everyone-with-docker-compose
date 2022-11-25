@@ -1,6 +1,6 @@
 # [full stack proxy nginx CodeIgniter for everyone with docker compose](https://github.com/damalis/full-stack-proxy-nginx-codeigniter-for-everyone-with-docker-compose)
 
-If You want to build a website with CodeIgniter "appstarter" at short time;
+If You want to build a reverse proxy website with CodeIgniter "appstarter" at short time;
 
 #### Full stack Proxy Nginx CodeIgniter "appstarter":
 <p align="left"> <a href="https://www.codeigniter.com/" target="_blank" rel="noreferrer"> <img src="https://avatars.githubusercontent.com/u/44521256?s=200&v=4" alt="codeigniter" height="40" width="40"/> </a>&nbsp;&nbsp;&nbsp; <a href="https://mariadb.org/" target="_blank" rel="noreferrer"> <img src="https://avatars.githubusercontent.com/u/4739304?s=200&v=4" alt="mariadb" height="40" width="40"/> </a>&nbsp;&nbsp;&nbsp; <a href="https://www.nginx.com" target="_blank" rel="noreferrer"> <img src="https://avatars.githubusercontent.com/u/1412239?s=200&v=4" alt="nginx" height="40" width="40"/> </a>&nbsp;&nbsp;&nbsp; <a href="https://www.php.net" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/github/explore/ccc16358ac4530c6a69b1b80c7223cd2744dea83/topics/php/php.png" alt="php" height="40" width="40"/> </a>&nbsp;&nbsp;&nbsp; <a href="https://redis.io" target="_blank" rel="noreferrer"> <img src="https://avatars.githubusercontent.com/u/1529926?s=200&v=4" alt="redis" height="40" width="40"/> </a>&nbsp;&nbsp;&nbsp; 
@@ -194,6 +194,11 @@ to remove external certbot-etc and portainer and the other volumes
 
 ```
 docker volume rm $(docker volume ls -q)
+```
+
+to remove portainer and the other images
+```
+docker rmi $(docker image ls -q)
 ```
 
 ### Project from existing source
