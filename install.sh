@@ -2,12 +2,12 @@
 
 clear
 echo ""
-echo "=========================================================================="
-echo "|                                                                        |"
-echo "|  full-stack-proxy-nginx-codeigniter-for-everyone-with-docker-compose   |"
-echo "|                        by Erdal ALTIN                                  |"
-echo "|                                                                        |"
-echo "=========================================================================="
+echo "======================================================================="
+echo "|                                                                     |"
+echo "| full-stack-proxy-nginx-codeigniter-for-everyone-with-docker-compose |"
+echo "|                        by Erdal ALTIN                               |"
+echo "|                                                                     |"
+echo "======================================================================="
 sleep 2
 
 # the "lpms" is an abbreviation of Linux Package Management System
@@ -323,13 +323,13 @@ done
 echo "Ok."
 
 db_table_prefix_regex="^[0-9a-zA-Z\$_]{3,}$"
-read -p 'Enter Database Table Prefix(at least 3 characters, default : wp_): ' db_table_prefix
-: ${db_table_prefix:=wp_}
+read -p 'Enter Database Table Prefix(at least 3 characters, default : data_): ' db_table_prefix
+: ${db_table_prefix:=data_}
 while [[ ! $db_table_prefix =~ $db_table_prefix_regex ]]
 do
 	echo "Try again (can only contain numerals 0-9, basic Latin letters, both lowercase and uppercase, dollar sign and underscore)"
-	read -p 'Enter Database Table Prefix(at least 3 characters, default : wp_): ' db_table_prefix
-	: ${db_table_prefix:=wp_}
+	read -p 'Enter Database Table Prefix(at least 3 characters, default : data_): ' db_table_prefix
+	: ${db_table_prefix:=data_}
 	sleep 1
 done
 echo "Ok."
